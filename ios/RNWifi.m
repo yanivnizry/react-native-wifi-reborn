@@ -100,6 +100,32 @@ RCT_EXPORT_METHOD(connectToProtectedSSIDPrefix:(NSString*)ssid
     }
 }
 
+RCT_EXPORT_METHOD(connectToProtectedSSIDOlderIOS:(NSString*)ssid
+                  withPassphrase:(NSString*)passphrase
+                  isWEP:(BOOL)isWEP
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  if (TARGET_IPHONE_SIMULATOR == 0) {
+    if (@available(iOS 11.0, *)) {
+      NEHotspotConfiguration* configuration = [[NEHotspotConfiguration alloc] initWithSSID:ssid passphrase:passphrase isWEP:isWEP];
+      configuration.joinOnce = true;
+
+      [[NEHotspotConfigurationManager sharedManager] applyConfiguration:configuration completionHandler:^(NSError * _Nullable error) {
+        if (error != nil) {
+          reject(@"nehotspot_error", @"Error while configuring WiFi", error);
+        } else {
+          resolve(nil);
+        }
+      }];
+
+    } else {
+      reject(@"ios_error", @"Not supported in iOS<11.0", nil);
+    }
+  } else {
+    reject(@"ios_error", @"Not supported on Simulator", nil);
+  }
+}
+
 RCT_EXPORT_METHOD(connectToProtectedSSID:(NSString*)ssid
                   withPassphrase:(NSString*)passphrase
                   isWEP:(BOOL)isWEP
