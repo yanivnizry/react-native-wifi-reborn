@@ -30,6 +30,12 @@ declare module 'react-native-wifi-reborn' {
         password: string | null,
         isWEP: boolean
     ): Promise<void>;
+    
+    export function connectToProtectedSSIDOlderIOS(
+        SSID: string,
+        password: string | null,
+        isWEP: boolean
+    ): Promise<void>;
 
     export function getCurrentWifiSSID(): Promise<string>;
 
