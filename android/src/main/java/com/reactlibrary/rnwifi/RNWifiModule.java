@@ -12,6 +12,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
 
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -23,9 +24,6 @@ import com.reactlibrary.rnwifi.errors.LoadWifiListErrorCodes;
 import com.reactlibrary.rnwifi.receivers.WifiScanResultReceiver;
 import com.reactlibrary.utils.LocationUtils;
 import com.reactlibrary.utils.PermissionUtils;
-import com.thanosfisherman.wifiutils.WifiUtils;
-import com.thanosfisherman.wifiutils.wifiConnect.ConnectionErrorCode;
-import com.thanosfisherman.wifiutils.wifiConnect.ConnectionSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -196,17 +194,42 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             return;
         }
 
-        WifiUtils.withContext(context).connectWith(SSID, password).onConnectionResult(new ConnectionSuccessListener() {
-            @Override
-            public void success() {
-                promise.resolve("connected");
-            }
+        try {
+            WifiConfiguration wfc = new WifiConfiguration();
 
-            @Override
-            public void failed(@NonNull ConnectionErrorCode errorCode) {
-                promise.reject("failed", "Could not connect to network");
-            }
-        }).start();
+            wfc.SSID = "\"".concat(SSID).concat("\"");
+            wfc.status = WifiConfiguration.Status.DISABLED;
+            wfc.priority = 40;
+
+            wfc.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            wfc.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            wfc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            wfc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+            wfc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+            wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+            wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+            wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+            wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+
+            wfc.preSharedKey = "\"".concat(password).concat("\"");
+
+            int networkId = wifi.addNetwork(wfc);
+            Log.v("rht", "Add result " + networkId);
+
+            boolean isDisconnected = wifi.disconnect();
+            Log.v("rht", "isDisconnected : " + isDisconnected);
+
+            boolean isEnabled = wifi.enableNetwork(networkId, true);
+            Log.v("rht", "isEnabled : " + isEnabled);
+
+            boolean isReconnected = wifi.reconnect();
+            Log.v("rht", "isReconnected : " + isReconnected);
+
+            promise.resolve(true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            promise.reject("messaging/fcm-token-error", e.getMessage());
+        }
     }
 
     /**
