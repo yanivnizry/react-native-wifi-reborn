@@ -213,6 +213,12 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
 
             wfc.preSharedKey = "\"".concat(password).concat("\"");
 
+            boolean wifiEnabled = wifi.isWifiEnabled();
+            
+            if (!wifiEnabled) {
+                wifiManager.setWifiEnabled(true);
+            }
+                
             int networkId = wifi.addNetwork(wfc);
             Log.v("rht", "Add result " + networkId);
 
