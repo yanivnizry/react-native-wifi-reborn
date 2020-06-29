@@ -216,7 +216,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             boolean wifiEnabled = wifi.isWifiEnabled();
             
             if (!wifiEnabled) {
-                wifiManager.setWifiEnabled(true);
+                wifi.setWifiEnabled(true);
             }
                 
             int networkId = wifi.addNetwork(wfc);
