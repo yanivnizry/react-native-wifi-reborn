@@ -33,6 +33,8 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
+import static java.lang.Thread.sleep;
+
 public class RNWifiModule extends ReactContextBaseJavaModule {
     private final WifiManager wifi;
     private final ReactApplicationContext context;
@@ -208,30 +210,44 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
             wfc.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
             wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
             wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+            wfc.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
             wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
             wfc.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
 
             wfc.preSharedKey = "\"".concat(password).concat("\"");
 
             boolean wifiEnabled = wifi.isWifiEnabled();
-            
+
             if (!wifiEnabled) {
                 wifi.setWifiEnabled(true);
             }
-                
-            int networkId = wifi.addNetwork(wfc);
-            Log.v("rht", "Add result " + networkId);
+            wifi.addNetwork(wfc);
 
-            boolean isDisconnected = wifi.disconnect();
-            Log.v("rht", "isDisconnected : " + isDisconnected);
+            sleep(3000);
+            List<WifiConfiguration> list = wifi.getConfiguredNetworks();
+            if(list.isEmpty())
+            {
+                Log.e("Connection Setup","Empty list returned");
+            }
 
-            boolean isEnabled = wifi.enableNetwork(networkId, true);
-            Log.v("rht", "isEnabled : " + isEnabled);
+            boolean isReconnected = false;
 
-            boolean isReconnected = wifi.reconnect();
-            Log.v("rht", "isReconnected : " + isReconnected);
-
-            promise.resolve(true);
+            for( WifiConfiguration i : list ) {
+                if(i.SSID != null && i.SSID.equals("\"" +  SSID +  "\"")) {
+                    Log.e("Connection Setup",i.SSID + " connrction attempted");
+                    boolean isDisconnected = wifi.disconnect();
+                    sleep(1000);
+                    boolean isEnabled = wifi.enableNetwork(i.networkId, true);
+                    sleep(1000);
+                    wifi.enableNetwork(i.networkId, true);
+                    sleep(1000);
+                    wifi.enableNetwork(i.networkId, true);
+                    sleep(3000);
+                    isReconnected = wifi.reconnect();
+                    break;
+                }
+            }
+            promise.resolve(isReconnected );
         } catch (Throwable e) {
             e.printStackTrace();
             promise.reject("messaging/fcm-token-error", e.getMessage());
@@ -357,7 +373,7 @@ public class RNWifiModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void reScanAndLoadWifiList(final Promise promise) {
         final WifiScanResultReceiver wifiScanResultReceiver = new WifiScanResultReceiver(wifi, promise);
-        getReactApplicationContext().registerReceiver(wifiScanResultReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        getReactApplicationContext().registerReceiver(wifiScanResultReceiver, new IntentFilter(wifi.SCAN_RESULTS_AVAILABLE_ACTION));
         wifi.startScan();
     }
 
