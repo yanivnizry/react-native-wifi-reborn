@@ -32,7 +32,7 @@ This project is based on the no longer maintained https://github.com/robwalkerco
 
 ### iOS
 
-You need use enable Access WIFI Information, with correct profile
+You need use enable `Access WIFI Information`, with correct profile. `Hotspot Configuration` is required in order to connect to networks.
 
 #### iOS 13
 
@@ -69,25 +69,6 @@ if (granted === PermissionsAndroid.RESULTS.GRANTED) {
 ### Autolinking (React Native 60+)
 
 This library is correctly autolinked on React Native 60+ 🎉.
-
-#### When using Wix React Native Navigation
-
-##### Android
-
-While the library is included (via settings.gradle) and added (via build.gradle), you still need to manually added to your MainApplication.
-
-```java
-import com.reactlibrary.RNWifiPackage;
-
-public class MainApplication extends NavigationApplication {
-@Override
-	public List<ReactPackage> createAdditionalReactPackages() {
-	return Arrays.asList(
-		...,
-		new RNWifiPackage());
-	}
-}
-```
 
 ### React Native Link (for React Native 0.59 and below)
 
@@ -174,9 +155,27 @@ Type: `boolean`
 Used on iOS. If true, the network is WEP Wi-Fi; otherwise it is a WPA or WPA2 personal Wi-Fi network.
 
 #### Errors:
-* `location permission missing`: The location permission (ACCESS_FINE_LOCATION) is not granted (android 6+).
-* `location off`: The location service needs to be turned on (android 6+).
-* `failed`: Could not connect to the network. Could be due to multiple reasons; not in rang or wrong password.
+* iOS:
+  * `unavailableForOSVersion`: Starting from iOS 11, NEHotspotConfigurationError is available.
+  * `invalid`: If an unknown error is occurred.
+  * `invalidSSID`: If the SSID is invalid.
+  * `invalidSSIDPrefix`: If the SSID prefix is invalid.
+  * `invalidPassphrase`: If the passphrase is invalid.
+  * `userDenied`: If the user canceled the request to join the asked network.
+  * `locationPermissionDenied`: Starting from iOS 13, location permission is denied.
+  * `locationPermissionRestricted`: Starting from iOS 13, location permission is restricted.
+  * `couldNotDetectSSID`: If the SSID couldn't be detected.
+* Android:
+  * `locationPermissionMissing`: Starting android 6, location permission needs to be granted for wifi scanning.
+  * `locationServicesOff`: Starting Android 6, location services needs to be on to scan for wifi networks.
+  * `couldNotEnableWifi`: Starting Android 10, apps are no longer allowed to enable wifi. User has to manually do this.
+  * `couldNotScan`: Starting Android 9, it's only allowed to scan 4 times per 2 minuts in a foreground app.
+  * `didNotFindNetwork`: If the wifi network is not in range, the security type is unknown and WifiUtils doesn't support connecting to the network.
+  * `authenticationErrorOccurred`: Authentication error occurred while trying to connect. The password could be incorrect or the user could have a saved network configuration with a different password!
+  * `android10ImmediatelyDroppedConnection` : Firmware bugs on OnePlus prevent it from connecting on some firmware versions. More info: https://github.com/ThanosFisherman/WifiUtils/issues/63.
+  * `timeoutOccurred`: Could not connect in the timeout window.
+* Both:
+  * `unableToConnect`: When an unknown error occurred.
 
 ### `getCurrentWifiSSID(): Promise`
 
@@ -208,14 +207,16 @@ Used on iOS. If YES, the network is WEP Wi-Fi; otherwise it is a WPA or WPA2 per
 
 
 #### Errors:
-
-* `notInRange`: The WIFI network is not currently in range.
-
-* `addOrUpdateFailed`: Could not add or update the network configuration.
-
-* `disconnectFailed`: Disconnecting from the network failed. This is done as part of the connect flow.
-
-* `connectNetworkFailed`: Could not connect to network.
+* `unavailableForOSVersion`: Starting from iOS 11, NEHotspotConfigurationError is available.
+* `invalid`: If an unknown error is occurred.
+* `invalidSSID`: If the SSID is invalid.
+* `invalidSSIDPrefix`: If the SSID prefix is invalid.
+* `invalidPassphrase`: If the passphrase is invalid.
+* `userDenied`: If the user canceled the request to join the asked network.
+* `locationPermissionDenied`: Starting from iOS 13, location permission is denied.
+* `locationPermissionRestricted`: Starting from iOS 13, location permission is restricted.
+* `couldNotDetectSSID`: If the SSID couldn't be detected.
+* `unableToConnect`: When an unknown error occurred.
 
 ## Only Android
 The following methods work only on Android
@@ -233,10 +234,9 @@ Returns a list of nearby WiFI networks.
 #### Errors:
 * `locationPermissionMissing`: Starting android 6, location permission needs to be granted for wifi 
 * `locationServicesOff`: Starting Android 6, location services needs to be on to scan for wifi networks.
-* `jsonParsingException`: Json parsing exception while parsing the result.
-* `illegalViewOperationException`: An exception caused by JS requesting the UI manager to perform an illegal view operation.
+* `exception`: Any other caught exception.
 
-### `reScanAndLoadWifiList(): Promise<Array<string>>`
+### `reScanAndLoadWifiList(): Promise<Array<WifiEntry>>`
 Similar to `loadWifiList` but it forcefully starts a new WiFi scan and only passes the results when the scan is done.
 
 ### `isEnabled(): Promise<boolean>`
@@ -284,11 +284,17 @@ If you are connected to that network, it will disconnect.
 * `locationPermissionMissing`: Starting android 6, location permission needs to be granted for wifi 
 
 ### `forceWifiUsage(useWifi: boolean): Promise`
+Deprecated; see forceWifiUsageWithOptions.
 
- Use this to execute api calls to a wifi network that does not have internet access.
- Useful for commissioning IoT devices.
- This will route all app network requests to the network (instead of the mobile connection).
- It is important to disable it again after using as even when the app disconnects from the wifi network it will keep on routing everything to wifi.
+### `forceWifiUsageWithOptions(useWifi: boolean, options<Record<string, unknown>)`
+
+Use this to execute api calls to a wifi network that does not have internet access.
+Useful for commissioning IoT devices.
+This will route all app network requests to the network (instead of the mobile connection).
+It is important to disable it again after using as even when the app disconnects from the wifi network it will keep on routing everything to wifi.
+
+#### options
+* `noInternet: Boolean`: Indicate the wifi network does not have internet connectivity.
 
 ## Conventions
 

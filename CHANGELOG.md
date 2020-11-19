@@ -1,3 +1,45 @@
+## [4.3.3](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.3.2...v4.3.3) (2020-10-19)
+
+
+### Bug Fixes
+
+* Add compileOptions JavaVersion.VERSION_1_8 ([#133](https://github.com/JuanSeBestia/react-native-wifi-reborn/issues/133)) ([f28a8dc](https://github.com/JuanSeBestia/react-native-wifi-reborn/commit/f28a8dcf94aab49a5498f5354ca44f0534dd8892))
+
+## [4.3.2](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.3.1...v4.3.2) (2020-10-01)
+
+
+### Bug Fixes
+
+* Fix Xcode 12 compatibility ([db9994a](https://github.com/JuanSeBestia/react-native-wifi-reborn/commit/db9994adeb11c225f1bab782db404153cd2b3d59)), closes [facebook/react-native#29633](https://github.com/facebook/react-native/issues/29633)
+
+## [4.3.1](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.3.0...v4.3.1) (2020-09-22)
+
+
+### Bug Fixes
+
+* **Android:** Fix WifiUtils dependencies ([#122](https://github.com/JuanSeBestia/react-native-wifi-reborn/issues/122)) ([caf9a7e](https://github.com/JuanSeBestia/react-native-wifi-reborn/commit/caf9a7ec82e47bf41947443373577cf256879cfb))
+
+# [4.3.0](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.2.2...v4.3.0) (2020-09-15)
+
+
+### Features
+
+* **Android:** Add forceWifiUsageWithOptions & add noInternet option ([#115](https://github.com/JuanSeBestia/react-native-wifi-reborn/issues/115)) ([df1b73a](https://github.com/JuanSeBestia/react-native-wifi-reborn/commit/df1b73addc9075472687887d786de5cc6d63a0c7))
+
+## [4.2.2](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.2.1...v4.2.2) (2020-08-27)
+
+
+### Bug Fixes
+
+* Fix reScanAndLoadWifiList() return type ([#108](https://github.com/JuanSeBestia/react-native-wifi-reborn/issues/108)) ([431f624](https://github.com/JuanSeBestia/react-native-wifi-reborn/commit/431f6243bbfc6f2c34ec4ba73bec4f0f5b35b645))
+
+## [4.2.1](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.2.0...v4.2.1) (2020-08-25)
+
+
+### Bug Fixes
+
+* loadWifiList and reScanAndLoadWifiList not returning a JSON array but a string ([#104](https://github.com/JuanSeBestia/react-native-wifi-reborn/issues/104)) ([9dce618](https://github.com/JuanSeBestia/react-native-wifi-reborn/commit/9dce6189eb3176fe2288ba8f85dbaf746aa3b4e6))
+
 # [4.2.0](https://github.com/JuanSeBestia/react-native-wifi-reborn/compare/v4.1.0...v4.2.0) (2020-06-08)
 
 
